@@ -1,0 +1,15 @@
+{
+  "name": "node-python-opencv",
+  "version": "0.0.1",
+  "description": "Module NodeJS pour la détection de mouvement avec python-opencv",
+  "main": "index.js",
+  "devDependencies": {
+    "mocha": "*",
+    "should": "*"
+  },
+  "scripts": {
+    "test": "mocha test/*.js"
+  },
+  "author": "Grégory Tardivel",
+  "license": "MIT"
+}
