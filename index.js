@@ -1,15 +1,18 @@
 var exec = require('child_process').execSync;
+var path = require('path');
 
 var options = {
 	encoding : 'UTF-8'
 };
 
 exports.pythonVersion = function () {
-	return exec('python python/version.py', options);
+	var script = path.resolve(__dirname, 'python/version.py');
+	return exec('python ' + script, options);
 };
 
 exports.moveDetection = function (frame1, frame2) {
-	var pyRect = exec('python python/movedetector.py ' + frame1 + ' ' + frame2, options);
+	var script = path.resolve(__dirname, 'python/movedetector.py');
+	var pyRect = exec('python ' + script + ' ' + frame1 + ' ' + frame2, options);
 	var rect = {};
 	if (pyRect.length > 0) {
 		rect = JSON.parse(pyRect);
@@ -22,5 +25,6 @@ exports.webcam = Webcam;
 function Webcam() {
 };
 Webcam.prototype.frame = function () {
-	return exec('python python/webcam_frame.py', options);
+	var script = path.resolve(__dirname, 'python/webcam_frame.py');
+	return exec('python ' + script, options);
 };
