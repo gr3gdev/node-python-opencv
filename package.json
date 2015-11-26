@@ -1,8 +1,12 @@
 {
   "name": "node-python-opencv",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Module NodeJS pour la détection de mouvement avec python-opencv",
   "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gr3gdev/node-python-opencv.git"
+  },
   "devDependencies": {
     "mocha": "*",
     "should": "*"

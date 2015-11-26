@@ -21,6 +21,8 @@ describe('Opencv', function () {
 	});
 	it('webcam', function () {
 		var webcam = new opencv.webcam();
-		should.exist(webcam.frame());
+		webcam.frame(function (stdout) {
+			should.exist(stdout);
+		});
 	});
 });

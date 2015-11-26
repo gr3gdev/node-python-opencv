@@ -1,4 +1,4 @@
-var exec = require('child_process').execSync;
+var process = require('child_process');
 var path = require('path');
 
 var options = {
@@ -7,12 +7,12 @@ var options = {
 
 exports.pythonVersion = function () {
 	var script = path.resolve(__dirname, 'python/version.py');
-	return exec('python ' + script, options);
+	return process.execSync('python ' + script, options);
 };
 
 exports.moveDetection = function (frame1, frame2) {
 	var script = path.resolve(__dirname, 'python/movedetector.py');
-	var pyRect = exec('python ' + script + ' ' + frame1 + ' ' + frame2, options);
+	var pyRect = process.execSync('python ' + script + ' ' + frame1 + ' ' + frame2, options);
 	var rect = {};
 	if (pyRect.length > 0) {
 		rect = JSON.parse(pyRect);
@@ -24,7 +24,9 @@ exports.webcam = Webcam;
 
 function Webcam() {
 };
-Webcam.prototype.frame = function () {
+Webcam.prototype.frame = function (callback) {
 	var script = path.resolve(__dirname, 'python/webcam_frame.py');
-	return exec('python ' + script, options);
+	process.exec('python ' + script, options, function (error, stdout, stderr) {
+		callback(stdout);
+	});
 };
