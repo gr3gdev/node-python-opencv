@@ -20,6 +20,16 @@ exports.moveDetection = function (frame1, frame2) {
 	return rect;
 };
 
+exports.faceDetection = function (frame, haarcascade) {
+	var script = path.resolve(__dirname, 'python/facedetector.py');
+	var pyJson = process.execSync('python ' + script + ' ' + frame + ' ' + haarcascade, options);
+	var json = {};
+	if (pyJson.length > 0) {
+		json = JSON.parse(pyJson);
+	}
+	return json;
+};
+
 exports.webcam = Webcam;
 
 function Webcam() {

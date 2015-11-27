@@ -1,8 +1,18 @@
-import sys, cv2, imutils, base64
+import sys, cv2, imutils, base64, threading
 import numpy as np
 
-if __name__ == '__main__':
-    video = cv2.VideoCapture(0)
+class webcamThread (threading.Thread):
+    def __init__(self, threadID, name):
+        threading.Thread.__init__(self)
+        self.threadID = threadID
+        self.name = name
+        self.video = cv2.VideoCapture(0)
+    def __del__(self):
+        self.video.release()
+    def run(self):
+        frame(self.video)
+
+def frame(video):
     while True:
         if video.isOpened():
             success, frame = video.read()
@@ -15,5 +25,8 @@ if __name__ == '__main__':
         # Conversion en Base64
         b64 = base64.encodestring(image)
         print 'data:image/png;base64,%s' % b64
-    video.release()
+
+if __name__ == '__main__':
+    thread = webcamThread(1, 'Webcam')
+    thread.start()
     sys.stdout.flush()

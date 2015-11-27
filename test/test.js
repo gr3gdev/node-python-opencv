@@ -19,6 +19,10 @@ describe('Opencv', function () {
 		should.equal(260, rect2.w);
 		should.equal(321, rect2.h);
 	});
+	it('faceDetection', function () {
+		var res = opencv.faceDetection('test/test1.jpg', 'test/haarcascade_frontalface_default.xml');
+		should.equal(11, res.faces.length);
+	});
 	it('webcam', function () {
 		var webcam = new opencv.webcam();
 		webcam.frame(function (stdout) {
