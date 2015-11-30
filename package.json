@@ -1,6 +1,6 @@
 {
   "name": "node-python-opencv",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Module NodeJS pour la détection de mouvement avec python-opencv",
   "main": "index.js",
   "repository": {
