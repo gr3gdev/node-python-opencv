@@ -42,7 +42,7 @@ function Webcam() {
 		readable: true
 	});
 	this.client.connect(4004, '127.0.0.1');
-	this.image = null;
+	this.callback = null;
 	var self = this;
 	var marqueur = 'WEBCAMimgPY';
 	var tmp_image = null;
@@ -52,7 +52,9 @@ function Webcam() {
 		if (pos >= 0) {
 			if (tmp_image !== null) {
 				tmp_image += str.substring(0, pos);
-				self.image = tmp_image;
+				if (self.callback !== null) {
+					self.callback(tmp_image);
+				}
 			}
 			tmp_image = str.substring(pos + marqueur.length);
 		} else {
@@ -61,5 +63,5 @@ function Webcam() {
 	});
 };
 Webcam.prototype.frame = function (callback) {
-	callback(this.image);
+	this.callback = callback;
 };
