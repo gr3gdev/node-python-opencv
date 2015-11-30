@@ -48,7 +48,6 @@ function Webcam() {
 	var tmp_image = null;
 	this.client.on('data', function (data) {
 		var str = data.toString('UTF-8');
-		console.log(str);
 		var pos = str.indexOf(marqueur);
 		if (pos >= 0) {
 			if (tmp_image !== null) {
