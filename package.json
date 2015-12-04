@@ -1,7 +1,7 @@
 {
   "name": "node-python-opencv",
-  "version": "1.0.0",
-  "description": "Module NodeJS pour la détection de mouvement avec python-opencv",
+  "version": "1.0.1",
+  "description": "Module NodeJS pour la détection de mouvement et la reconnaissance faciale avec python-opencv",
   "main": "index.js",
   "repository": {
     "type": "git",

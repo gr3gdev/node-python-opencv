@@ -1,29 +1,44 @@
-import cv2, sys
+import socket, sys, detector
+
+class DetectMove(object):
+    def __init__(self):
+        self.image1 = None
+        self.image2 = None
 
 if __name__ == '__main__':
-    if len(sys.argv) == 3:
-        firstFrame = cv2.imread(sys.argv[1])
-        img = cv2.imread(sys.argv[2])
-        firstGray = cv2.cvtColor(firstFrame, cv2.COLOR_BGR2GRAY)
-        firstGray = cv2.equalizeHist(firstGray)
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        gray = cv2.equalizeHist(gray)
-        #gray = cv2.GaussianBlur(gray, (21, 21), 0)
-        frameDelta = cv2.absdiff(firstGray, gray)
-        thresh = cv2.threshold(frameDelta, 25, 255, cv2.THRESH_BINARY)[1]
-        thresh = cv2.dilate(thresh, None, iterations=2)
-        #cnts, _ = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        _, cnts, _ = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        contourMax = None
-        areaMax = None
-        for c in cnts:
-            contour = cv2.contourArea(c)
-            if contour < 500:
-                continue
-            if contourMax is None or contour > contourMax:
-                contourMax = contour
-                areaMax = c
-        if not areaMax is None:
-            (x, y, w, h) = cv2.boundingRect(areaMax)
-            print '{"x": "%s", "y": "%s", "w": "%s", "h": "%s"}' % (x, y, w, h)
-    sys.stdout.flush()
+    if len(sys.argv) == 2:
+        mode = None
+        TCP_IP = '127.0.0.1'
+        TCP_PORT = int(sys.argv[1])
+        BUFFER_SIZE = 16
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.bind((TCP_IP, TCP_PORT))
+        s.listen(1)
+        conn, addr = s.accept()
+        while 1:
+            data = conn.recv(BUFFER_SIZE)
+            try:
+                if data == 'STOP':
+                    break
+                if data == 'INIT':
+                    mode = DetectMove()
+                    conn.send('INITIALIZED')
+                elif data == 'EXECUTE':
+                    (x, y, w, h) = detector.MoveDetection.find(mode.image1, mode.image2)
+                    conn.send('{"x": "%s", "y": "%s", "w": "%s", "h": "%s"}' % (x, y, w, h))
+                elif data is not None:
+                    if data.startswith('BUF1'):
+                        BUFFER_SIZE = int(data[5:])
+                        conn.send('BUFFER1 RECEIVED');
+                    if data.startswith('BUF2'):
+                        BUFFER_SIZE = int(data[5:])
+                        conn.send('BUFFER2 RECEIVED');
+                    if data.startswith('IMG1'):
+                        mode.image1 = data[5:]
+                        conn.send('IMAGE1 RECEIVED');
+                    if data.startswith('IMG2'):
+                        mode.image2 = data[5:]
+                        conn.send('IMAGE2 RECEIVED');
+            except:
+                conn.send('{"ERROR": "%s : %s"}' % (sys.exc_info()[0], sys.exc_info()[1]))
+        conn.close()

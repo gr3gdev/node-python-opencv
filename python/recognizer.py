@@ -1,24 +1,23 @@
-import cv2, os, detector, csv
+import cv2, os, csv, sys, convert
+
 import numpy as np
 
-from os.path import isfile, join
+from os.path import isfile
 
-class FaceRecognizer(object):
-
-    def __init__(self, csvFile):
-        self.faceDetector = detector.FaceDetector()
+if __name__ == '__main__':
+    if len(sys.argv) == 4:
+        file = open(sys.argv[1], 'rb')
+        frame = cv2.imread(sys.argv[2])
+        faceCascade = cv2.CascadeClassifier(sys.argv[3])
         images = []
-        self.names = []
+        names = []
         labels = []
         rownum = 0
-        file = open(csvFile, 'rb')
         reader = csv.reader(file, delimiter=';')
-        print 'Load database file'
         for row in reader:
             if rownum == 0:
                 header = row
             else:
-                print '> %s: %s, %s: %s (%s=%s)' % (header[0], row[0], header[1], row[1], header[2], row[2])
                 idx = row[0]
                 name = row[1]
                 path = row[2]
@@ -26,23 +25,20 @@ class FaceRecognizer(object):
                     img = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
                     img_to_save = cv2.resize(img, (100, 100))
                     images.append(img_to_save)
-                    self.names.append(name)
+                    names.append(name)
                     labels.append(int(idx))
             rownum += 1
         file.close()
-        #self.recognizer = cv2.face.createLBPHFaceRecognizer()
-        self.recognizer = cv2.face.createEigenFaceRecognizer(10, 10.0)
-        self.recognizer.train(images, np.array(labels))
-        self.borderWidth = 1
-        self.borderColor = (255, 0, 0)
-
-    def find(self, img, draw = False):
-        faces, gray = self.faceDetector.find(img, False)
+        #recognizer = cv2.face.createLBPHFaceRecognizer()
+        recognizer = cv2.face.createEigenFaceRecognizer(10, 10.0)
+        recognizer.train(images, np.array(labels))
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        gray = cv2.equalizeHist(gray)
+        faces = faceCascade.detectMultiScale(gray, 1.2, 8)
+        finds = []
         for (x, y, w, h) in faces:
             img_to_check = cv2.resize(gray[y: y + h, x: x + w], (100, 100)) 
-            nbr_predicted, conf = self.recognizer.predict(img_to_check)
+            nbr_predicted, conf = recognizer.predict(img_to_check)
             if nbr_predicted > 0:
-                print '%s is recognized (%s)' % (self.names[nbr_predicted], conf)
-                if draw == True:
-                    cv2.putText(img, self.names[nbr_predicted], (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 2, self.borderColor, 2)
-                    cv2.rectangle(img, (x, y), (x + w, y + h), self.borderColor, self.borderWidth)
+                finds.append('{"name": "%s", "x": "%s", "y": "%s", "w": "%s", "h": "%s"}' % (names[nbr_predicted], x, y, w, h))
+        convert.Json.write_array('faces', finds)
