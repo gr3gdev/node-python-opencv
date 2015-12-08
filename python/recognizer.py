@@ -1,14 +1,15 @@
-import cv2, os, csv, sys, convert
-
+import cv2, os, csv
 import numpy as np
 
 from os.path import isfile
 
-if __name__ == '__main__':
-    if len(sys.argv) == 4:
-        file = open(sys.argv[1], 'rb')
-        frame = cv2.imread(sys.argv[2])
-        faceCascade = cv2.CascadeClassifier(sys.argv[3])
+class Face:
+    @staticmethod
+    def find(csvFile, image, haarcascade):
+        file = open(csvFile)
+        frame = image.decode('base64', 'strict')
+        frame = cv2.imdecode(np.fromstring(frame, dtype=np.uint8), -1)
+        faceCascade = cv2.CascadeClassifier(haarcascade)
         images = []
         names = []
         labels = []
@@ -41,4 +42,4 @@ if __name__ == '__main__':
             nbr_predicted, conf = recognizer.predict(img_to_check)
             if nbr_predicted > 0:
                 finds.append('{"name": "%s", "x": "%s", "y": "%s", "w": "%s", "h": "%s"}' % (names[nbr_predicted], x, y, w, h))
-        convert.Json.write_array('faces', finds)
+        return finds
