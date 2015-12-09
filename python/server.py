@@ -21,8 +21,8 @@ if __name__ == '__main__':
                     buffer = int(data[6:])
                     conn.send('BUFFER OK')
                     data = conn.recv(buffer)
-                    flux = data.split()
-                    faces = recognizer.Face.find(flux[0], flux[1], flux[2])
+                    flux = data.split(' ')
+                    faces = recognizer.Face.find(flux[0], flux[1], flux[2], float(flux[3]), int(flux[4]))
                     finds = '{"faces": ['
                     index = 0
                     for data in faces:
@@ -36,15 +36,15 @@ if __name__ == '__main__':
                     buffer = int(data[6:])
                     conn.send('BUFFER OK')
                     data = conn.recv(buffer)
-                    flux = data.split()
+                    flux = data.split(' ')
                     (x, y, w, h) = detector.MoveDetection.find(flux[0], flux[1])
                     conn.send('{"x": "%s", "y": "%s", "w": "%s", "h": "%s"}' % (x, y, w, h))
                 if data.startswith(FACE_DETECTION):
                     buffer = int(data[6:])
                     conn.send('BUFFER OK')
                     data = conn.recv(buffer)
-                    flux = data.split()
-                    faces = detector.FaceDetection.find(flux[0], flux[1])
+                    flux = data.split(' ')
+                    faces = detector.FaceDetection.find(flux[0], flux[1], float(flux[2]), int(flux[3]))
                     finds = '{"faces": ['
                     index = 0
                     for (x, y, w, h) in faces:
@@ -55,6 +55,8 @@ if __name__ == '__main__':
                     finds += ']}'
                     conn.send('%s' % finds)
             except:
-                conn.send('{"error": "%s - %s"}' % (sys.exc_info()[0], sys.exc_info()[1]))
+                message = '%s' % sys.exc_value
+                message = message.replace('\\', '/').replace('\n', '').replace('\r', '')
+                conn.send('{"error": "%s"}' % message)
             conn.close()
         s.close()

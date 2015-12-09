@@ -5,7 +5,7 @@ from os.path import isfile
 
 class Face:
     @staticmethod
-    def find(csvFile, image, haarcascade):
+    def find(csvFile, image, haarcascade, scaleFactor = 1.2, minNeighbors = 8):
         file = open(csvFile)
         frame = image.decode('base64', 'strict')
         frame = cv2.imdecode(np.fromstring(frame, dtype=np.uint8), -1)
@@ -35,7 +35,7 @@ class Face:
         recognizer.train(images, np.array(labels))
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         gray = cv2.equalizeHist(gray)
-        faces = faceCascade.detectMultiScale(gray, 1.2, 8)
+        faces = faceCascade.detectMultiScale(gray, scaleFactor, minNeighbors)
         finds = []
         for (x, y, w, h) in faces:
             img_to_check = cv2.resize(gray[y: y + h, x: x + w], (100, 100)) 

@@ -25,7 +25,9 @@ Ce module permet d'utiliser les fonctionnalités de opencv via python pour :
 	var opencv = require('node-python-opencv');
 	
 	// Numéro de port facultatif
-	var webcam = new opencv.webcam(8090);
+	var webcam = new opencv.webcam({
+		port: 8090
+	});
 	webcam.frame(function (image) {
 		// image est au format base64
 	});
@@ -43,8 +45,8 @@ Ce module permet d'utiliser les fonctionnalités de opencv via python pour :
 	});
 
 	// Arguments :
-	// image1 : image de base
-	// image2 : image où trouver les différences
+	// image1 : image de base au format base64
+	// image2 : image au format base64 où trouver les différences 
 	detector.findMove({
 		'image1': image1,
 		'image2': image2
@@ -65,11 +67,15 @@ Ce module permet d'utiliser les fonctionnalités de opencv via python pour :
 	});
 
 	// Arguments :
-	// image : image où trouver les visages
+	// image : image au format base64 où trouver les visages
 	// haarcascade : fichier haarcascade à utiliser
+	// scaleFactor (facultatif) : échelle de redimensionnement de l'image pour la détection
+	// minNeighbors (facultatif) : Nombre de voisins que chaque rectangle détecté peut conserver 
 	detector.findFaces({
 		'image': image,
-		'haarcascade': 'path/to/haarcascade_frontalface_default.xml'
+		'haarcascade': 'path/to/haarcascade_frontalface_default.xml',
+		'scaleFactor': 1.2,
+		'minNeighbors': 8
 	}, function (data, err) {
 		// Return JSON object {faces: [{x: N, y: N, w: N, h: N}, ...]}
 		console.log(JSON.stringify(data));
@@ -88,8 +94,10 @@ Ce module permet d'utiliser les fonctionnalités de opencv via python pour :
 
 	// Arguments :
 	// csv : base de données d'images à utiliser pour la reconnaissance
-	// image : image où trouver les visages
+	// image : image au format base64 où trouver les visages
 	// haarcascade : fichier haarcascade à utiliser
+	// scaleFactor (facultatif) : échelle de redimensionnement de l'image pour la détection
+	// minNeighbors (facultatif) : Nombre de voisins que chaque rectangle détecté peut conserver
 	detector.recognizeFaces({
 		'csv': 'path/to/database.csv'
 		'image': image,
@@ -98,3 +106,13 @@ Ce module permet d'utiliser les fonctionnalités de opencv via python pour :
 		// Return JSON object {faces: [{name: 'xxx', x: N, y: N, w: N, h: N}, ...]}
 		console.log(JSON.stringify(data));
 	});
+
+Exemple de fichier csv pour la reconnaissance faciale (**Attention de bien respecter ce format !**) :
+
+	Label;Name;PATH
+	1;name_person1;/path/to/person1_image1.jpg
+	1;name_person1;/path/to/person1_image2.jpg
+	1;name_person1;/path/to/person1_image3.jpg
+	2;name_person2;/path/to/person2_image1.jpg
+	2;name_person2;/path/to/person2_image2.jpg
+	3;name_person3;/path/to/person3_image1.jpg

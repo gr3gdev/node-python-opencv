@@ -71,11 +71,27 @@ Detector.prototype.findMove = function (json, callback) {
 	this.connect(callback, 'MOVDET', send);
 };
 Detector.prototype.findFaces = function (json, callback) {
-	var send = json.image + ' ' + json.haarcascade;
+	var scaleFactor = 1.2;
+	var minNeighbors = 8;
+	if (json.scaleFactor) {
+		scaleFactor = json.scaleFactor;
+	}
+	if (json.minNeighbors) {
+		minNeighbors = json.minNeighbors;
+	}
+	var send = json.image + ' ' + json.haarcascade + ' ' + scaleFactor + ' ' + minNeighbors;
 	this.connect(callback, 'FACDET', send);
 };
 Detector.prototype.recognizeFaces = function (json, callback) {
-	var send = json.csv + ' ' + json.image + ' ' + json.haarcascade;
+	var scaleFactor = 1.2;
+	var minNeighbors = 8;
+	if (json.scaleFactor) {
+		scaleFactor = json.scaleFactor;
+	}
+	if (json.minNeighbors) {
+		minNeighbors = json.minNeighbors;
+	}
+	var send = json.csv + ' ' + json.image + ' ' + json.haarcascade + ' ' + scaleFactor + ' ' + minNeighbors;
 	this.connect(callback, 'FACREC', send);
 };
 Detector.prototype.close = function (callback) {
@@ -90,15 +106,19 @@ exports.pythonVersion = function () {
 
 exports.webcam = Webcam;
 
-function Webcam(webcamPort) {
+function Webcam(conf) {
 	var port = 4003;
-	if (webcamPort) {
-		port = webcamPort;
+	if (conf) {
+		if (conf.port) {
+			port = conf.port;
+		}
 	}
 	var script = path.resolve(__dirname, 'python/webcam_frame.py');
 	var command = 'python ' + script + ' ' + port;
 	child.exec(command, options, function (error, stdout, stderr) {
-		console.log(stdout);
+		if (error) {
+			console.log(stderr);
+		}
 	});
 	this.client = new net.Socket({
 		readable: true
@@ -108,6 +128,11 @@ function Webcam(webcamPort) {
 	var self = this;
 	var marqueur = 'WEBCAM';
 	var tmp_image = null;
+	this.client.on('error', function (err) {
+		if (err) {
+			self.callback(null, err);
+		}
+	});
 	this.client.on('data', function (data) {
 		var str = data.toString('UTF-8');
 		var pos = str.indexOf(marqueur);
