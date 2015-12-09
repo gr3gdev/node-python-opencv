@@ -90,15 +90,20 @@ exports.pythonVersion = function () {
 
 exports.webcam = Webcam;
 
-function Webcam() {
+function Webcam(webcamPort) {
+	var port = 4003;
+	if (webcamPort) {
+		port = webcamPort;
+	}
 	var script = path.resolve(__dirname, 'python/webcam_frame.py');
-	child.exec('python ' + script + ' ' + webcamPort, options, function (error, stdout, stderr) {
+	var command = 'python ' + script + ' ' + port;
+	child.exec(command, options, function (error, stdout, stderr) {
 		console.log(stdout);
 	});
 	this.client = new net.Socket({
 		readable: true
 	});
-	this.client.connect(webcamPort, '127.0.0.1');
+	this.client.connect(port, '127.0.0.1');
 	this.callback = null;
 	var self = this;
 	var marqueur = 'WEBCAM';

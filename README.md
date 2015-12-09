@@ -1,5 +1,5 @@
 # node-python-opencv
-Module NodeJS pour python-opencv
+*Module NodeJS pour python-opencv*
 
 Ce module permet d'utiliser les fonctionnalités de opencv via python pour :
 
@@ -7,26 +7,31 @@ Ce module permet d'utiliser les fonctionnalités de opencv via python pour :
 - la détection et la reconnaissance faciale
 - le streaming d'une webcam
 
+
 ## Pré-requis :
 - Installer **Python 2.7**
 - Installer les modules python suivants : 
 	- *python-opencv* (pour Windows compiler opencv-contrib)
 	- *numpy*
 
+
 ## Installation :
     npm install node-python-opencv
 
+
 ## Utilisations :
-Streaming webcam :
+**Streaming webcam :**
 
 	var opencv = require('node-python-opencv');
 	
-	var webcam = new opencv.webcam();
+	// Numéro de port facultatif
+	var webcam = new opencv.webcam(8090);
 	webcam.frame(function (image) {
 		// image est au format base64
 	});
 
-Détection de mouvement entre 2 images :
+
+**Détection de mouvement entre 2 images :**
 
     var opencv = require('node-python-opencv');
 
@@ -48,7 +53,8 @@ Détection de mouvement entre 2 images :
 		console.log(JSON.stringify(data));
 	});
 
-Détection de visage(s) :
+
+**Détection de visage(s) :**
 
     var opencv = require('node-python-opencv');
 
@@ -69,7 +75,8 @@ Détection de visage(s) :
 		console.log(JSON.stringify(data));
 	});
 
-Reconnaissance faciale :
+
+**Reconnaissance faciale :**
 
     var opencv = require('node-python-opencv');
 
